@@ -2,16 +2,18 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 import {
+  buildPlayerUrl,
   img,
-  PLAYER,
+  PLAYER_PROVIDERS,
   tmdb,
   titleOf,
   yearOf,
   type MediaType,
+  type PlayerProviderId,
   type TmdbEpisode,
   type TmdbItem,
 } from "../api/tmdb";
-import { saveContinue, saveHistory } from "../lib/store";
+import { getPlayerProvider, saveContinue, saveHistory, setPlayerProvider } from "../lib/store";
 
 export default function Watch() {
   const { type = "movie", id = "" } = useParams();
@@ -23,10 +25,11 @@ export default function Watch() {
   const [item, setItem] = useState<TmdbItem | null>(null);
   const [episodes, setEpisodes] = useState<TmdbEpisode[]>([]);
   const [openSeasons, setOpenSeasons] = useState(true);
+  const [playerProvider, setPlayerProviderState] = useState<PlayerProviderId>(getPlayerProvider);
 
   const src = useMemo(
-    () => (media === "tv" ? PLAYER.tv(id, season, episode) : PLAYER.movie(id)),
-    [media, id, season, episode]
+    () => buildPlayerUrl(playerProvider, media, id, season, episode, item ?? undefined),
+    [playerProvider, media, id, season, episode, item]
   );
 
   useEffect(() => {
@@ -67,16 +70,39 @@ export default function Watch() {
 
   const seasons = (item?.seasons || []).filter((s) => s.season_number > 0);
 
+  const handlePlayerProviderChange = (value: string) => {
+    const next = value as PlayerProviderId;
+    setPlayerProviderState(next);
+    setPlayerProvider(next);
+  };
+
   return (
     <div className="min-h-screen bg-black">
       <div className={`grid ${media === "tv" ? "lg:grid-cols-[1fr_340px]" : "grid-cols-1"} min-h-screen`}>
         <div className="relative flex min-h-[56vh] flex-col bg-black">
-          <button
-            onClick={() => nav(-1)}
-            className="absolute left-4 top-4 z-20 flex items-center gap-2 rounded-full bg-black/50 px-3 py-1.5 text-sm backdrop-blur"
-          >
-            <ArrowLeft size={16} /> Back
-          </button>
+          <div className="absolute left-4 right-4 top-4 z-20 flex items-center justify-between gap-3">
+            <button
+              onClick={() => nav(-1)}
+              className="flex items-center gap-2 rounded-full bg-black/50 px-3 py-1.5 text-sm backdrop-blur"
+            >
+              <ArrowLeft size={16} /> Back
+            </button>
+            <label className="flex items-center gap-2 rounded-full bg-black/55 px-2.5 py-1.5 text-xs text-white/80 backdrop-blur">
+              <span>Provider</span>
+              <select
+                value={playerProvider}
+                onChange={(event) => handlePlayerProviderChange(event.target.value)}
+                className="rounded-full border border-white/10 bg-black/70 px-2 py-1 text-xs text-white outline-none"
+                aria-label="Select video provider"
+              >
+                {PLAYER_PROVIDERS.map((provider) => (
+                  <option key={provider.id} value={provider.id}>
+                    {provider.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
           <iframe
             key={src}
             src={src}

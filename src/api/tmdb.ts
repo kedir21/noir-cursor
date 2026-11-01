@@ -2,11 +2,47 @@ export const TMDB_KEY = "5e6a638a16f35974c254b7e6da34619d";
 export const TMDB = "https://api.themoviedb.org/3";
 export const IMG = "https://image.tmdb.org/t/p";
 
+export const PLAYER_PROVIDER_IDS = ["vidy", "vidzee", "viduki"] as const;
+export type PlayerProviderId = (typeof PLAYER_PROVIDER_IDS)[number];
+export const DEFAULT_PLAYER: PlayerProviderId = "vidy";
+
+export function buildPlayerUrl(
+  provider: PlayerProviderId,
+  media: MediaType,
+  id: number | string,
+  season = 1,
+  episode = 1,
+  item?: Pick<TmdbItem, "imdb_id">
+) {
+  const color = "8c52ff";
+  const imdbId = item?.imdb_id || id;
+
+  switch (provider) {
+    case "vidy":
+      return media === "tv"
+        ? `https://www.vidy.st/tv/${id}/${season}/${episode}`
+        : `https://www.vidy.st/movie/${id}`;
+    case "viduki":
+      return media === "tv"
+        ? `https://viduki.net/1/tv/${imdbId}/${season}/${episode}?color=${color}`
+        : `https://viduki.net/1/movie/${imdbId}?color=${color}`;
+    case "vidzee":
+    default:
+      return media === "tv"
+        ? `https://player.vidzee.wtf/embed/tv/${id}/${season}/${episode}?color=${color}`
+        : `https://player.vidzee.wtf/embed/movie/${id}?color=${color}`;
+  }
+}
+
+export const PLAYER_PROVIDERS = [
+  { id: "vidy", name: "Vidy" },
+  { id: "vidzee", name: "Vidzee" },
+  { id: "viduki", name: "Viduki" },
+] as const satisfies ReadonlyArray<{ id: PlayerProviderId; name: string }>;
+
 export const PLAYER = {
-  movie: (id: number | string) =>
-    `https://player.vidzee.wtf/embed/movie/${id}?color=8c52ff`,
-  tv: (id: number | string, s = 1, e = 1) =>
-    `https://player.vidzee.wtf/embed/tv/${id}/${s}/${e}?color=8c52ff`,
+  movie: (id: number | string) => buildPlayerUrl(DEFAULT_PLAYER, "movie", id),
+  tv: (id: number | string, s = 1, e = 1) => buildPlayerUrl(DEFAULT_PLAYER, "tv", id, s, e),
 };
 
 export type MediaType = "movie" | "tv";
@@ -15,6 +51,7 @@ export type TmdbItem = {
   id: number;
   title?: string;
   name?: string;
+  imdb_id?: string;
   overview: string;
   poster_path: string | null;
   backdrop_path: string | null;

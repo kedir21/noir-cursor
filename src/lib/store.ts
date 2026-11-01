@@ -1,4 +1,5 @@
-import type { MediaType } from "../api/tmdb";
+import type { MediaType, PlayerProviderId } from "../api/tmdb";
+import { DEFAULT_PLAYER } from "../api/tmdb";
 
 export type SavedItem = {
   id: number;
@@ -19,6 +20,7 @@ const KEYS = {
   continue: "noirx.continue",
   history: "noirx.history",
   theme: "noirx.theme",
+  player: "noirx.player",
 };
 
 function read<T>(key: string, fallback: T): T {
@@ -73,4 +75,13 @@ export function saveHistory(item: SavedItem) {
 export function clearHistory() {
   write(KEYS.history, []);
   write(KEYS.continue, []);
+}
+
+export function getPlayerProvider(): PlayerProviderId {
+  const value = read<string | null>(KEYS.player, null);
+  return value === "vidzee" || value === "vidy" || value === "viduki" ? value : DEFAULT_PLAYER;
+}
+
+export function setPlayerProvider(provider: PlayerProviderId) {
+  write(KEYS.player, provider);
 }

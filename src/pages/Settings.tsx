@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { User, Palette, MonitorPlay, Captions, LayoutGrid, Clock } from "lucide-react";
 import Footer from "../components/Footer";
-import { clearHistory, getHistory, getWatchlist } from "../lib/store";
+import { clearHistory, getHistory, getPlayerProvider, getWatchlist, setPlayerProvider } from "../lib/store";
+import { PLAYER_PROVIDERS, type PlayerProviderId } from "../api/tmdb";
 
 const tabs = [
   { id: "account", label: "Account", icon: User },
@@ -15,6 +16,7 @@ const tabs = [
 export default function Settings() {
   const [tab, setTab] = useState("account");
   const [accent, setAccent] = useState("white");
+  const [playerProvider, setPlayerProviderState] = useState<PlayerProviderId>(getPlayerProvider);
   const history = getHistory();
   const list = getWatchlist();
 
@@ -92,9 +94,26 @@ export default function Settings() {
           {tab === "player" && (
             <>
               <h2 className="font-display text-2xl font-semibold">Player</h2>
-              <p className="mt-2 max-w-lg text-sm text-white/50">
-                Movies play at `player.vidzee.wtf/embed/movie/{"{id}"}` and TV at
-                `/embed/tv/{"{id}"}/{"{s}"}/{"{e}"}` with color 8c52ff.
+              <div className="mt-4 max-w-md rounded-2xl border border-white/8 bg-[#141414] p-4">
+                <label className="mb-2 block text-sm text-white/60">Preferred provider</label>
+                <select
+                  value={playerProvider}
+                  onChange={(event) => {
+                    const next = event.target.value as PlayerProviderId;
+                    setPlayerProviderState(next);
+                    setPlayerProvider(next);
+                  }}
+                  className="w-full rounded-xl border border-white/10 bg-black px-3 py-2 text-sm outline-none"
+                >
+                  {PLAYER_PROVIDERS.map((provider) => (
+                    <option key={provider.id} value={provider.id}>
+                      {provider.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <p className="mt-4 max-w-lg text-sm text-white/50">
+                Supported sources include Vidzee, Vidy, and Viduki. Vidy and Viduki use the TMDB or IMDb ID pattern shown in the app.
               </p>
             </>
           )}
