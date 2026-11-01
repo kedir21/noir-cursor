@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-display: "Syne", "DM Sans", sans-serif;
+  --font-script: "Great Vibes", cursive;
+  --color-bg: #0a0a0a;
+  --color-surface: #141414;
+  --color-elevated: #1e1e1e;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  background: #0a0a0a;
+  color: #fff;
+}
+
+body {
+  font-family: "DM Sans", system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.hide-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.row-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.row-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.glass-nav {
+  background: rgba(18, 18, 18, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(22px);
+}
+
+.hero-fade {
+  background: linear-gradient(
+    90deg,
+    rgba(10, 10, 10, 0.92) 0%,
+    rgba(10, 10, 10, 0.55) 42%,
+    rgba(10, 10, 10, 0.12) 72%,
+    rgba(10, 10, 10, 0) 100%
+  );
+}
+
+.hero-bottom {
+  background: linear-gradient(180deg, transparent 0%, #0a0a0a 92%);
+}
+
+.poster-shadow {
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+}
+
+.rank-num {
+  font-family: "Syne", sans-serif;
+  font-weight: 800;
+  font-size: 7.4rem;
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.22);
+  letter-spacing: -0.08em;
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  .rank-num {
+    font-size: 4.6rem;
+  }
+}
